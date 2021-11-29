@@ -94,6 +94,19 @@ def UpBlockComp(in_planes, out_planes):
     )
     return block
 
+class LatentLayer(nn.Module):
+    def __init__(self, nz):
+        super().__init__()
+        self.latent = nn.Sequential(
+            nn.linear(nz,nz),
+            nn.linear(nz,nz),
+            nn.linear(nz,nz)
+            )
+
+    def forward(self, x):
+        return self.latent(noise)
+    
+
 
 class Generator(nn.Module):
     def __init__(self, ngf=64, nz=100, nc=3, im_size=1024):
@@ -106,6 +119,7 @@ class Generator(nn.Module):
 
         self.im_size = im_size
 
+        self.latent = LatentLayer(nz)
         self.init = InitLayer(nz, channel=nfc[4])
 
         self.feat_8 = UpBlockComp(nfc[4], nfc[8])
@@ -125,7 +139,8 @@ class Generator(nn.Module):
 
     def forward(self, x):
 
-        feat_4 = self.init(x)
+        lat_x = self.latent(x)
+        feat_4 = self.init(lat_x)
         feat_8 = self.feat_8(feat_4)
         feat_16 = self.feat_16(feat_8)
         feat_32 = self.feat_32(feat_16)

@@ -101,7 +101,7 @@ class ProjectedGAN:
     def __init__(self, args):
         self.img_size = args.image_size
 
-        self.gen = Generator(im_size=args.image_size)
+        self.gen = Generator(im_size=args.image_size, nz=args.latent_dim)
         self.gen_optim = Adam(self.gen.parameters(), lr=args.lr, betas=(args.beta1, args.beta2))
 
         self.efficient_net = build_efficientnet_lite("efficientnet_lite1", 1000)
