@@ -221,12 +221,17 @@ class ProjectedGAN:
                 self.gen_optim.step()
 
                 if i % self.log_every == 0:
-                    path = os.path.join(self.ckpt_path, str(epoch))
-                    os.mkdir(path)
+                    P=os.path.dirname(os.path.realpath(__file__))
+                    path = os.path.join(P, self.ckpt_path)
+                    try:
+                        os.mkdir(path)
+                    path = os.path.join(path, str(epoch))
+                    try:
+                        os.mkdir(path)
                     with torch.no_grad():
                         vutils.save_image(gen_imgs_gen.add(1).mul(0.5), os.path.join(path, f'/{epoch}_{i}.jpg'), nrow=4)
                     logging.info(f"Iteration {i}: Gen Loss = {gen_loss}, Disc Loss = {disc_losses}.")
-                    torch.save(self.gen.state_dict(), os.path.join(path, "Generator"))
+                    torch.save(self.gen.state_dict(), os.path.join(path, "Generator"+str(i)))
                     if self.save_all:
                         for j in range(len(self.discs)):
                             torch.save(self.discs[j].state_dict(), os.path.join(path, f"Discriminator_{j}"))
